@@ -129,6 +129,15 @@ function syncTimeline() {
     tl.querySelectorAll("li").forEach((li, i, all) => { const at = all.length > 1 ? i / (all.length - 1) : 0, next = all.length > 1 ? (i + 1) / (all.length - 1) : 1; li.classList.toggle("is-done", p >= at - 0.001); li.classList.toggle("is-current", p >= at - 0.001 && p < next - 0.001); });
 }
 
+// On phones the vertical track runs exactly from the center of the first dot to the center of the last one, however long the text under the last step is
+function fitTrack() {
+    const tl = $("timeline"), track = tl.querySelector(".buy-track"), dots = tl.querySelectorAll(".buy-dot");
+    if (!matchMedia("(max-width: 640px)").matches || !dots.length) { track.style.top = track.style.bottom = ""; return; }
+    const box = tl.getBoundingClientRect(), a = dots[0].getBoundingClientRect(), b = dots[dots.length - 1].getBoundingClientRect();
+    track.style.top = `${a.top + a.height / 2 - box.top}px`; track.style.bottom = `${box.bottom - (b.top + b.height / 2)}px`;
+}
+fitTrack(); addEventListener("resize", fitTrack); document.fonts?.ready.then(fitTrack);
+
 // Questions that open in place
 $("faq-list").innerHTML = bundle.faq.map(f => `<details><summary>${f.q}</summary><p>${f.a}</p></details>`).join("");
 

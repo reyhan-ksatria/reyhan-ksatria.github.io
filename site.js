@@ -83,3 +83,6 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden) star
 if (matchMedia("(pointer: fine)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
     addEventListener("pointermove", e => { const dx = e.clientX / innerWidth - 0.5, dy = e.clientY / innerHeight - 0.5; document.documentElement.style.setProperty("--px", dx.toFixed(3)); document.documentElement.style.setProperty("--py", dy.toFixed(3)); }, { passive: true });
 }
+
+// An empty tap listener on the page tells mobile Chrome the page handles its own taps, so a plain tap on text no longer opens Touch to Search
+document.body.addEventListener("click", () => {});
