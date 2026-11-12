@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reyhan Ksatria Brahmacarya</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,400..700,0..100&family=Figtree:ital,wght@0,400..800;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Apply the saved theme before first paint, with the dark space theme as the default -->
+    <script>
+        try { document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark"; } catch (e) { document.documentElement.dataset.theme = "dark"; }
+    </script>
+</head>
+<body>
+
+<!-- Fixed backdrop: a living sky canvas for night and day, plus soft nebula glows that breathe and drift slightly with the pointer at night -->
+<div class="backdrop" aria-hidden="true">
+    <canvas id="sky"></canvas>
+    <div class="nebula n1"></div>
+    <div class="nebula n2"></div>
+    <div class="nebula n3"></div>
+</div>
+<div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
+
+<div class="layout">
+
+    <!-- Sidebar navigation, becomes a sticky top bar on small screens -->
+    <aside class="sidebar">
+        <a href="#top" class="brand">
+            <span class="brand-mark">RKB</span>
+            <span class="brand-text">Reyhan Ksatria<br>Brahmacarya</span>
+        </a>
+
+        <nav class="nav" aria-label="Sections">
+            <span class="nav-indicator" id="nav-indicator" aria-hidden="true"></span>
+            <a href="#top" class="nav-link active">Overview</a>
+            <a href="#about" class="nav-link">About</a>
+            <a href="#academic" class="nav-link">Academic Record</a>
+            <a href="#research" class="nav-link">Research</a>
+            <a href="#projects" class="nav-link">Projects</a>
+            <a href="bundle.html" class="nav-link nav-sub">ML Bundle <span class="nav-badge">New</span></a>
+            <a href="#experience" class="nav-link">Experience</a>
+            <a href="#skills" class="nav-link">Skills &amp; Certificates</a>
+            <a href="#contact" class="nav-link">Contact</a>
+        </nav>
+
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode">
+            <svg class="icon-moon" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="moon-fill" x1=".05" y1=".1" x2=".9" y2=".95"><stop offset="0" stop-color="#fff8cc"/><stop offset=".45" stop-color="#ffd94f"/><stop offset="1" stop-color="#eb9c0c"/></linearGradient><radialGradient id="moon-iris" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#8fc2ff"/><stop offset="1" stop-color="#2e5fcf"/></radialGradient><clipPath id="moon-clip"><path d="M18.6 2.1A14.2 14.2 0 1 0 21.6 29.7C17.6 28.8 14.6 26.6 14.2 23.6C14.9 23.2 15.5 22.5 15.2 21.7C14.8 21.5 14.5 21.2 14.5 20.8C15.2 20.5 15.5 19.8 15.1 19.3C14.8 19 14.8 18.6 15.2 18.4C16.3 18 17.3 17.4 17.4 16.8C16.4 15.6 14.8 14.4 14.1 13C13.3 11.2 13.1 9.2 13.6 7.3C14.4 4.9 16.3 3.1 18.6 2.1Z"/></clipPath><clipPath id="moon-eye"><path d="M6.35 13.6Q9.25 9.9 12.15 13.2Q9.45 16.3 6.35 13.6Z"/></clipPath></defs><g transform="translate(16.4 16.6) rotate(-25) scale(.9) translate(-12.2 -16)"><path d="M18.6 2.1A14.2 14.2 0 1 0 21.6 29.7C17.6 28.8 14.6 26.6 14.2 23.6C14.9 23.2 15.5 22.5 15.2 21.7C14.8 21.5 14.5 21.2 14.5 20.8C15.2 20.5 15.5 19.8 15.1 19.3C14.8 19 14.8 18.6 15.2 18.4C16.3 18 17.3 17.4 17.4 16.8C16.4 15.6 14.8 14.4 14.1 13C13.3 11.2 13.1 9.2 13.6 7.3C14.4 4.9 16.3 3.1 18.6 2.1Z" fill="url(#moon-fill)" stroke="#c27c06" stroke-width=".75" stroke-linejoin="round"/><g fill="#d99a1c" opacity=".3" clip-path="url(#moon-clip)"><circle cx="6.4" cy="9.4" r="1.2"/><circle cx="5.4" cy="20.6" r="1.6"/><circle cx="8.6" cy="25.4" r="1.1"/></g><path d="M6.35 13.6Q9.25 9.9 12.15 13.2Q9.45 16.3 6.35 13.6Z" fill="#fff"/><g clip-path="url(#moon-eye)"><circle cx="9.55" cy="13.8" r="1.8" fill="url(#moon-iris)"/><circle cx="9.6" cy="13.9" r=".85" fill="#16213f"/><circle cx="10.2" cy="13.2" r=".45" fill="#fff"/><path d="M3 8.5H14V13.1H12.15Q9.25 10.9 6.35 13.5H3Z" fill="#f7c93c"/></g><path d="M6.35 13.6Q9.25 9.9 12.15 13.2Q9.45 16.3 6.35 13.6Z" fill="none" stroke="#5a3200" stroke-width=".45"/><path d="M6.35 13.5Q9.25 10.9 12.15 13.1" fill="none" stroke="#5a3200" stroke-width="1" stroke-linecap="round"/><path d="M7.13 12.71Q5.92 12.35 4.56 12.67Q5.68 12.74 6.73 13.35ZM8.35 12.19Q7.38 11.28 5.98 10.91Q6.99 11.52 7.71 12.6ZM9.51 12.06Q9.03 10.96 8 10.15Q8.58 11.02 8.76 12.16Z" fill="#5a3200"/><ellipse cx="9.85" cy="17.8" rx="1.7" ry="1.05" fill="#ff8a5c" opacity=".5"/></g></svg>
+            <svg class="icon-sun" viewBox="0 0 32 32" aria-hidden="true"><defs><radialGradient id="sun-ray" cx=".5" cy=".5" r=".5"><stop offset=".55" stop-color="#ffd23c"/><stop offset="1" stop-color="#f59a0b"/></radialGradient><radialGradient id="sun-fill" cx=".38" cy=".32" r=".8"><stop offset="0" stop-color="#fff6b0"/><stop offset=".55" stop-color="#ffd630"/><stop offset="1" stop-color="#f7a510"/></radialGradient></defs><path d="M25.08 18.44Q26.73 19.04 27.92 20.94Q25.73 21.44 24.14 20.69ZM20.69 24.14Q21.44 25.73 20.94 27.92Q19.04 26.73 18.44 25.08ZM13.56 25.08Q12.96 26.73 11.06 27.92Q10.56 25.73 11.31 24.14ZM7.86 20.69Q6.27 21.44 4.08 20.94Q5.27 19.04 6.92 18.44ZM6.92 13.56Q5.27 12.96 4.08 11.06Q6.27 10.56 7.86 11.31ZM11.31 7.86Q10.56 6.27 11.06 4.08Q12.96 5.27 13.56 6.92ZM18.44 6.92Q19.04 5.27 20.94 4.08Q21.44 6.27 20.69 7.86ZM24.14 11.31Q25.73 10.56 27.92 11.06Q26.73 12.96 25.08 13.56Z" fill="#ffe27a" stroke="#e3a01a" stroke-width=".35" stroke-linejoin="round"/><path d="M25.26 14.41Q28.16 14.13 31.20 16.00Q28.16 17.87 25.26 17.59ZM23.68 21.43Q25.92 23.27 26.75 26.75Q23.27 25.92 21.43 23.68ZM17.59 25.26Q17.87 28.16 16.00 31.20Q14.13 28.16 14.41 25.26ZM10.57 23.68Q8.73 25.92 5.25 26.75Q6.08 23.27 8.32 21.43ZM6.74 17.59Q3.84 17.87 0.80 16.00Q3.84 14.13 6.74 14.41ZM8.32 10.57Q6.08 8.73 5.25 5.25Q8.73 6.08 10.57 8.32ZM14.41 6.74Q14.13 3.84 16.00 0.80Q17.87 3.84 17.59 6.74ZM21.43 8.32Q23.27 6.08 26.75 5.25Q25.92 8.73 23.68 10.57Z" fill="url(#sun-ray)" stroke="#d8820a" stroke-width=".4" stroke-linejoin="round"/><circle cx="16" cy="16" r="9.8" fill="url(#sun-fill)" stroke="#d8820a" stroke-width=".5"/><ellipse cx="11.4" cy="18.6" rx="1.7" ry="1.05" fill="#ff7a4d" opacity=".5"/><ellipse cx="20.6" cy="18.6" rx="1.7" ry="1.05" fill="#ff7a4d" opacity=".5"/><ellipse cx="13.1" cy="14.4" rx="1.4" ry="1.9" fill="#fff" stroke="#5a3200" stroke-width=".4"/><ellipse cx="18.9" cy="14.4" rx="1.4" ry="1.9" fill="#fff" stroke="#5a3200" stroke-width=".4"/><circle cx="13.4" cy="14.8" r=".9" fill="#3b2200"/><circle cx="19.2" cy="14.8" r=".9" fill="#3b2200"/><circle cx="13.75" cy="14.35" r=".32" fill="#fff"/><circle cx="19.55" cy="14.35" r=".32" fill="#fff"/><path d="M11.5 12Q12.6 10.5 14.6 11.2Q12.8 10.95 11.5 12ZM20.5 12Q19.4 10.5 17.4 11.2Q19.2 10.95 20.5 12Z" fill="#7a4300" stroke="#7a4300" stroke-width=".25" stroke-linejoin="round"/><path d="M12.7 18.4q3.3 4 6.6 0q-3.3 1.2-6.6 0Z" fill="#7a2e0e" stroke="#5a3200" stroke-width=".5" stroke-linejoin="round"/><path d="M14.5 20.3q1.5.85 3 0q-1.5-.75-3 0Z" fill="#ff7b72"/></svg>
+            <span class="theme-label">Dark Mode</span>
+        </button>
+    </aside>
+
+    <main class="main" id="top">
+
+        <!-- Hero: name and positioning followed by the interactive survival plot from the thesis -->
+        <section class="hero" aria-labelledby="hero-name">
+            <div class="hero-text">
+                <p class="hero-kicker">Actuarial Science at Universitas Brawijaya</p>
+                <h1 id="hero-name">Reyhan Ksatria Brahmacarya</h1>
+                <p class="hero-lede">I work on statistical modeling and machine learning with a focus on survival analysis and numerical optimization.</p>
+                <div class="hero-actions">
+                    <a href="mailto:reyhanpochinki667@gmail.com" class="btn btn-primary">Email me</a>
+                    <a href="#research-thesis" class="btn btn-ghost">Read my thesis</a>
+                    <a href="#" class="btn btn-ghost">View my CV</a>
+                </div>
+            </div>
+
+            <figure class="plot-card" aria-labelledby="plot-title">
+                <div class="view-switch" role="tablist" aria-label="Chart view">
+                    <button type="button" role="tab" aria-selected="true" data-view="2d">2D Fit</button>
+                    <button type="button" role="tab" aria-selected="false" data-view="3d">3D Likelihood</button>
+                </div>
+
+                <div class="plot-head">
+                    <div>
+                        <p class="plot-title" id="plot-title">Weibull Fit against Kaplan–Meier</p>
+                        <p class="plot-sub" id="plot-sub">Lifetime data of 228 lung cancer patients with 63 right-censored observations</p>
+                    </div>
+                    <div class="plot-tools" role="group" aria-label="Chart zoom">
+                        <button type="button" data-zoom="in" aria-label="Zoom in">+</button>
+                        <button type="button" data-zoom="out" aria-label="Zoom out">−</button>
+                        <button type="button" data-zoom="reset">Reset</button>
+                    </div>
+                </div>
+
+                <div class="plot-legend" data-for="2d">
+                    <span class="key key-w">Weibull</span>
+                    <span class="key key-km">Kaplan–Meier</span>
+                    <span class="plot-hint"><span class="hint-mouse">Drag across the chart to zoom in and double-click to reset</span><span class="hint-touch">Use the zoom buttons and tap the chart to read values</span></span>
+                </div>
+
+                <!-- Stage holds the player and the chart area so the 3D view can go full screen with its controls -->
+                <div class="plot-stage" id="stage-3d">
+                    <div class="plot-legend player" data-for="3d" hidden>
+                        <button type="button" class="play-btn" id="play-3d" aria-label="Play the BFGS iterations">
+                            <svg class="icon-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg>
+                            <svg class="icon-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5h3v11H4zM9 2.5h3v11H9z"/></svg>
+                            <span id="play-label">Play</span>
+                        </button>
+                        <label class="duration"><span class="visually-hidden">Duration</span>
+                            <select id="duration-3d"><option value="10000">10 s</option><option value="20000" selected>20 s</option><option value="40000">40 s</option></select>
+                        </label>
+                        <button type="button" class="sound-btn" id="sound-3d" aria-pressed="false" aria-label="Turn sound on" title="Sound">
+                            <svg class="icon-muted" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7.5h3l4-3.5v12l-4-3.5H3z"/><path d="M13.5 7.5l4 5M17.5 7.5l-4 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                            <svg class="icon-sound" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7.5h3l4-3.5v12l-4-3.5H3z"/><path d="M13 7a4 4 0 0 1 0 6M15.5 5a7 7 0 0 1 0 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                        </button>
+                        <label class="volume" title="Volume">
+                            <span class="visually-hidden">Volume</span>
+                            <input type="range" id="volume-3d" min="1" max="100" value="60">
+                            <output id="volume-value">60</output>
+                        </label>
+                        <input type="range" id="scrub-3d" min="0" max="1000" value="1000" aria-label="Animation progress">
+                        <span class="play-time" id="time-3d">0:20 / 0:20</span>
+                    </div>
+
+                    <div class="plot-area">
+                        <svg id="survival-plot" data-for="2d" viewBox="0 0 720 360" role="img" aria-label="Weibull survival function compared with the Kaplan–Meier estimator"></svg>
+                        <canvas id="likelihood-3d" data-for="3d" role="img" aria-label="Negative log-likelihood surface over k and tau with the BFGS iterates" hidden></canvas>
+                        <div class="iter-hud" id="hud-3d" data-for="3d" hidden></div>
+                        <div class="scale-bar" id="scale-3d" data-for="3d" hidden>
+                            <span class="sb-title">Scale</span>
+                            <div class="sb-ruler"><i></i></div>
+                            <div class="sb-ends"><span>0</span><span>Δτ = <b class="sb-max"></b></span></div>
+                        </div>
+                        <div class="cursor-coords" id="coords-3d" hidden></div>
+                        <div class="plot-tip" id="plot-tip" hidden></div>
+                        <span class="zoom-level" id="zoom-level" aria-live="polite" hidden></span>
+                        <span class="brush-level" id="brush-level" hidden></span>
+                        <button type="button" class="fs-btn" id="fs-3d" data-for="3d" aria-label="Full screen" title="Full screen (F)" hidden>
+                            <svg class="icon-enter" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>
+                            <svg class="icon-exit" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <dl class="plot-stats">
+                    <div><dt>Shape Parameter</dt><dd><span class="hat">k</span><span class="sym">=</span><span data-fit="k"></span></dd></div>
+                    <div><dt>Scale Parameter</dt><dd><span class="hat">τ</span><span class="sym">=</span><span data-fit="tau"></span></dd></div>
+                    <div><dt>Mean Absolute Error</dt><dd><span class="sym">MAE =</span><span data-fit="mae"></span></dd></div>
+                </dl>
+            </figure>
+        </section>
+
+        <!-- Academic summary: one card with the GPA ring, graduate status, totals, grade mix, and top courses -->
+        <section class="glance" id="stats" aria-label="At a glance">
+            <div class="card glance-main" style="--hue: var(--teal)">
+                <span class="glance-label"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 9.5 12 5l9.5 4.5L12 14Z"/><path d="M6.5 11.6v4.2c0 1.3 2.5 2.7 5.5 2.7s5.5-1.4 5.5-2.7v-4.2"/><path d="M21.5 9.5v5"/></svg>Academic Summary</span>
+                <div class="glance-body">
+                    <div class="glance-ring-col">
+                        <div class="gpa-ring" style="--off: 3.75"><svg viewBox="0 0 120 120" aria-hidden="true"><defs><linearGradient id="ring-grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color: var(--accent)"/><stop offset="1" style="stop-color: var(--rose)"/></linearGradient></defs><circle class="ring-track" cx="60" cy="60" r="52"/><circle class="ring-fill" cx="60" cy="60" r="52" pathLength="100"/></svg><p class="ring-text"><b>3.85</b><span>of 4.00 GPA</span></p></div>
+                        <span class="stat-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Graduate</span>
+                    </div>
+                    <div class="glance-mid">
+                        <dl class="glance-nums"><div><dt>Courses</dt><dd id="stat-courses">54</dd></div><div><dt>Credits</dt><dd id="stat-credits">146</dd></div></dl>
+                        <div class="glance-mix"><span class="mix-bar" id="glance-mix"></span><span class="glance-mix-legend" id="glance-mix-legend"></span></div>
+                    </div>
+                    <div class="glance-best">
+                        <span class="glance-sub">Top Courses</span>
+                        <ol class="glance-top" id="glance-top"></ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About -->
+        <section id="about" class="section">
+            <header class="section-head"><h2>About</h2></header>
+            <p class="prose">
+                I am an Actuarial Science graduate from Brawijaya University with a strong interest in
+                statistical modeling, survival analysis, machine learning, and numerical optimization.
+                Through this portfolio, I present my academic background, research, projects, and experience
+                in these fields.
+            </p>
+        </section>
+
+        <!-- Academic record: grade mix, searchable course table -->
+        <section id="academic" class="section">
+            <header class="section-head">
+                <h2>Academic Record</h2>
+                <p>Every course ranked by final score</p>
+            </header>
+
+            <div class="grade-mix">
+                <div class="gpa-line">
+                    <span>GPA <strong>3.85</strong> / 4.00</span>
+                </div>
+                <div class="mix-bar" id="mix-bar" aria-hidden="true"></div>
+                <ul class="mix-legend" id="mix-legend"></ul>
+            </div>
+
+            <div class="table-tools">
+                <label class="search">
+                    <span class="visually-hidden">Search courses</span>
+                    <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg>
+                    <input type="search" id="course-search" placeholder="Search by course" autocomplete="off">
+                    <button type="button" class="search-clear" id="search-clear" aria-label="Clear search" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button>
+                </label>
+                <div class="grade-filter" role="group" aria-label="Filter by grade">
+                    <button type="button" data-grade="" aria-pressed="true">All</button>
+                    <button type="button" data-grade="A" aria-pressed="false">A</button>
+                    <button type="button" data-grade="B+" aria-pressed="false">B+</button>
+                </div>
+                <span class="result-count" id="result-count"></span>
+            </div>
+
+            <div class="table-wrap">
+                <table class="courses">
+                    <thead>
+                        <tr><th class="num">Rank</th><th>Course</th><th class="num">Credits</th><th>Score</th><th>Grade</th></tr>
+                    </thead>
+                    <tbody id="course-body"></tbody>
+                </table>
+                <p id="no-result" class="empty" hidden>No course matches that search. Try a different keyword.</p>
+            </div>
+
+            <div class="pager">
+                <button id="prev-btn" type="button">Previous</button>
+                <span id="page-number">1 / 1</span>
+                <button id="next-btn" type="button">Next</button>
+            </div>
+        </section>
+
+        <!-- Research entries are rendered from data.js -->
+        <section id="research" class="section">
+            <header class="section-head">
+                <h2>Research</h2>
+                <p>Research conducted during my studies</p>
+            </header>
+
+            <div id="research-list"></div>
+        </section>
+
+        <!-- Project entries are rendered from data.js -->
+        <section id="projects" class="section">
+            <header class="section-head">
+                <h2>Projects</h2>
+                <p>Part of my Machine Learning Bundle</p>
+            </header>
+
+            <p class="section-lede" id="projects-lede"></p>
+            <ul class="project-list" id="project-list"></ul>
+
+            <!-- Banner for the bundle page: a plum to magenta gradient with twinkling snow in light mode and a night panel in dark mode, a button with a folder that opens and sparkles on hover and is the only link, and a fanned stack of folders in every field color -->
+            <div class="bundle-banner">
+                <span class="banner-text"><b>Explore the Machine Learning Bundle</b><span>More complete project folders with Jupyter notebooks</span><a href="bundle.html" class="banner-cta">See the bundle<i class="cta-folder" aria-hidden="true"><svg viewBox="0 0 24 24"><path class="f-back" d="M3 6.6A1.6 1.6 0 0 1 4.6 5h4.3l1.9 2h8.6A1.6 1.6 0 0 1 21 8.6v8.8a1.6 1.6 0 0 1-1.6 1.6H4.6A1.6 1.6 0 0 1 3 17.4Z"/><path class="f-paper" d="M6 8.6h12v6H6Z"/><path class="f-front" d="M3.4 10.6h17.2a.9.9 0 0 1 .9 1.1l-1.2 5.9a1.6 1.6 0 0 1-1.6 1.3H5.3a1.6 1.6 0 0 1-1.6-1.3l-1.2-5.9a.9.9 0 0 1 .9-1.1Z"/></svg><b class="spark s1"></b><b class="spark s2"></b><b class="spark s3"></b></i></a></span>
+                <span class="banner-stack" id="banner-stack" aria-hidden="true"></span>
+            </div>
+        </section>
+
+        <!-- Experience timeline -->
+        <section id="experience" class="section">
+            <header class="section-head">
+                <h2>Experience</h2>
+                <p>Problem setting and teaching</p>
+            </header>
+
+            <ol class="timeline" id="experience-list"></ol>
+        </section>
+
+        <!-- Skills and certificates -->
+        <section id="skills" class="section">
+            <header class="section-head">
+                <h2>Skills &amp; Certificates</h2>
+            </header>
+
+            <!-- Skills and certificates are rendered from data.js into two labeled groups stacked top to bottom -->
+            <div class="stack">
+                <div>
+                    <h3 class="col-label">Skills <span id="skill-count"></span></h3>
+                    <div class="skill-list" id="skill-list"></div>
+                </div>
+                <div>
+                    <h3 class="col-label">Certificates <span id="cert-count"></span></h3>
+                    <div class="cert-list" id="cert-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact -->
+        <section id="contact" class="section contact">
+            <header class="section-head"><h2>Contact</h2></header>
+            <a class="contact-email" href="mailto:reyhanpochinki667@gmail.com">reyhanpochinki667@gmail.com</a>
+            <ul class="contact-links">
+                <li><a href="https://wa.me/6289603017924" target="_blank" rel="noopener">WhatsApp 0896-0301-7924</a></li>
+                <li><a href="#" target="_blank" rel="noopener">LinkedIn</a></li>
+                <li><a href="#" target="_blank" rel="noopener">GitHub</a></li>
+                <li><a href="https://www.kaggle.com/reyhanksatria" target="_blank" rel="noopener">Kaggle</a></li>
+            </ul>
+        </section>
+
+        <footer class="footer">© 2026 Reyhan Ksatria Brahmacarya</footer>
+
+        <!-- Confirmation shown before a free project ZIP is downloaded -->
+        <dialog class="confirm" id="dl-confirm" aria-labelledby="dl-title">
+            <div class="confirm-body">
+                <span class="confirm-field" id="dl-field"></span>
+                <h3 id="dl-title"></h3>
+                <p>You are about to download the complete project folder as a ZIP file.</p>
+                <p class="confirm-size" id="dl-size"></p>
+                <ul class="confirm-contents" id="dl-contents"></ul>
+                <div class="confirm-actions"><button type="button" class="btn btn-ghost" id="dl-cancel">Cancel</button><a class="btn confirm-go" id="dl-go" href="#" download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></svg>Yes, download</a></div>
+            </div>
+        </dialog>
+
+        <!-- Lightbox that shows a certificate image above the page -->
+        <dialog class="lightbox" id="lightbox" aria-label="Certificate">
+            <button type="button" class="lightbox-close" id="lightbox-close" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+            <figure>
+                <img id="lightbox-img" alt="">
+                <p class="lightbox-missing" id="lightbox-missing" hidden>The certificate image is not available yet.</p>
+                <figcaption id="lightbox-caption"></figcaption>
+            </figure>
+        </dialog>
+
+    </main>
+</div>
+
+<script src="data.js"></script>
+<script src="site.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

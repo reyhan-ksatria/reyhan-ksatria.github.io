@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Machine Learning Bundle · Reyhan Ksatria Brahmacarya</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,400..700,0..100&family=Figtree:ital,wght@0,400..800;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Apply the saved theme before first paint, with the dark space theme as the default -->
+    <script>
+        try { document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark"; } catch (e) { document.documentElement.dataset.theme = "dark"; }
+    </script>
+</head>
+<body>
+
+<!-- Fixed backdrop: a living sky canvas for night and day, plus soft nebula glows that breathe and drift slightly with the pointer at night -->
+<div class="backdrop" aria-hidden="true">
+    <canvas id="sky"></canvas>
+    <div class="nebula n1"></div>
+    <div class="nebula n2"></div>
+    <div class="nebula n3"></div>
+</div>
+<div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
+
+<div class="layout">
+
+    <!-- Sidebar navigation, becomes a sticky top bar on small screens -->
+    <aside class="sidebar">
+        <a href="index.html" class="brand">
+            <span class="brand-mark">RKB</span>
+            <span class="brand-text">Reyhan Ksatria<br>Brahmacarya</span>
+        </a>
+
+        <nav class="nav" aria-label="Sections">
+            <span class="nav-indicator" id="nav-indicator" aria-hidden="true"></span>
+            <a href="index.html" class="nav-link">Overview</a>
+            <a href="index.html#about" class="nav-link">About</a>
+            <a href="index.html#academic" class="nav-link">Academic Record</a>
+            <a href="index.html#research" class="nav-link">Research</a>
+            <a href="index.html#projects" class="nav-link">Projects</a>
+            <a href="bundle.html" class="nav-link nav-sub active" aria-current="page">ML Bundle <span class="nav-badge">New</span></a>
+            <a href="index.html#experience" class="nav-link">Experience</a>
+            <a href="index.html#skills" class="nav-link">Skills &amp; Certificates</a>
+            <a href="index.html#contact" class="nav-link">Contact</a>
+        </nav>
+
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode">
+            <svg class="icon-moon" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="moon-fill" x1=".05" y1=".1" x2=".9" y2=".95"><stop offset="0" stop-color="#fff8cc"/><stop offset=".45" stop-color="#ffd94f"/><stop offset="1" stop-color="#eb9c0c"/></linearGradient><radialGradient id="moon-iris" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#8fc2ff"/><stop offset="1" stop-color="#2e5fcf"/></radialGradient><clipPath id="moon-clip"><path d="M18.6 2.1A14.2 14.2 0 1 0 21.6 29.7C17.6 28.8 14.6 26.6 14.2 23.6C14.9 23.2 15.5 22.5 15.2 21.7C14.8 21.5 14.5 21.2 14.5 20.8C15.2 20.5 15.5 19.8 15.1 19.3C14.8 19 14.8 18.6 15.2 18.4C16.3 18 17.3 17.4 17.4 16.8C16.4 15.6 14.8 14.4 14.1 13C13.3 11.2 13.1 9.2 13.6 7.3C14.4 4.9 16.3 3.1 18.6 2.1Z"/></clipPath><clipPath id="moon-eye"><path d="M6.35 13.6Q9.25 9.9 12.15 13.2Q9.45 16.3 6.35 13.6Z"/></clipPath></defs><g transform="translate(16.4 16.6) rotate(-25) scale(.9) translate(-12.2 -16)"><path d="M18.6 2.1A14.2 14.2 0 1 0 21.6 29.7C17.6 28.8 14.6 26.6 14.2 23.6C14.9 23.2 15.5 22.5 15.2 21.7C14.8 21.5 14.5 21.2 14.5 20.8C15.2 20.5 15.5 19.8 15.1 19.3C14.8 19 14.8 18.6 15.2 18.4C16.3 18 17.3 17.4 17.4 16.8C16.4 15.6 14.8 14.4 14.1 13C13.3 11.2 13.1 9.2 13.6 7.3C14.4 4.9 16.3 3.1 18.6 2.1Z" fill="url(#moon-fill)" stroke="#c27c06" stroke-width=".75" stroke-linejoin="round"/><g fill="#d99a1c" opacity=".3" clip-path="url(#moon-clip)"><circle cx="6.4" cy="9.4" r="1.2"/><circle cx="5.4" cy="20.6" r="1.6"/><circle cx="8.6" cy="25.4" r="1.1"/></g><path d="M6.35 13.6Q9.25 9.9 12.15 13.2Q9.45 16.3 6.35 13.6Z" fill="#fff"/><g clip-path="url(#moon-eye)"><circle cx="9.55" cy="13.8" r="1.8" fill="url(#moon-iris)"/><circle cx="9.6" cy="13.9" r=".85" fill="#16213f"/><circle cx="10.2" cy="13.2" r=".45" fill="#fff"/><path d="M3 8.5H14V13.1H12.15Q9.25 10.9 6.35 13.5H3Z" fill="#f7c93c"/></g><path d="M6.35 13.6Q9.25 9.9 12.15 13.2Q9.45 16.3 6.35 13.6Z" fill="none" stroke="#5a3200" stroke-width=".45"/><path d="M6.35 13.5Q9.25 10.9 12.15 13.1" fill="none" stroke="#5a3200" stroke-width="1" stroke-linecap="round"/><path d="M7.13 12.71Q5.92 12.35 4.56 12.67Q5.68 12.74 6.73 13.35ZM8.35 12.19Q7.38 11.28 5.98 10.91Q6.99 11.52 7.71 12.6ZM9.51 12.06Q9.03 10.96 8 10.15Q8.58 11.02 8.76 12.16Z" fill="#5a3200"/><ellipse cx="9.85" cy="17.8" rx="1.7" ry="1.05" fill="#ff8a5c" opacity=".5"/></g></svg>
+            <svg class="icon-sun" viewBox="0 0 32 32" aria-hidden="true"><defs><radialGradient id="sun-ray" cx=".5" cy=".5" r=".5"><stop offset=".55" stop-color="#ffd23c"/><stop offset="1" stop-color="#f59a0b"/></radialGradient><radialGradient id="sun-fill" cx=".38" cy=".32" r=".8"><stop offset="0" stop-color="#fff6b0"/><stop offset=".55" stop-color="#ffd630"/><stop offset="1" stop-color="#f7a510"/></radialGradient></defs><path d="M25.08 18.44Q26.73 19.04 27.92 20.94Q25.73 21.44 24.14 20.69ZM20.69 24.14Q21.44 25.73 20.94 27.92Q19.04 26.73 18.44 25.08ZM13.56 25.08Q12.96 26.73 11.06 27.92Q10.56 25.73 11.31 24.14ZM7.86 20.69Q6.27 21.44 4.08 20.94Q5.27 19.04 6.92 18.44ZM6.92 13.56Q5.27 12.96 4.08 11.06Q6.27 10.56 7.86 11.31ZM11.31 7.86Q10.56 6.27 11.06 4.08Q12.96 5.27 13.56 6.92ZM18.44 6.92Q19.04 5.27 20.94 4.08Q21.44 6.27 20.69 7.86ZM24.14 11.31Q25.73 10.56 27.92 11.06Q26.73 12.96 25.08 13.56Z" fill="#ffe27a" stroke="#e3a01a" stroke-width=".35" stroke-linejoin="round"/><path d="M25.26 14.41Q28.16 14.13 31.20 16.00Q28.16 17.87 25.26 17.59ZM23.68 21.43Q25.92 23.27 26.75 26.75Q23.27 25.92 21.43 23.68ZM17.59 25.26Q17.87 28.16 16.00 31.20Q14.13 28.16 14.41 25.26ZM10.57 23.68Q8.73 25.92 5.25 26.75Q6.08 23.27 8.32 21.43ZM6.74 17.59Q3.84 17.87 0.80 16.00Q3.84 14.13 6.74 14.41ZM8.32 10.57Q6.08 8.73 5.25 5.25Q8.73 6.08 10.57 8.32ZM14.41 6.74Q14.13 3.84 16.00 0.80Q17.87 3.84 17.59 6.74ZM21.43 8.32Q23.27 6.08 26.75 5.25Q25.92 8.73 23.68 10.57Z" fill="url(#sun-ray)" stroke="#d8820a" stroke-width=".4" stroke-linejoin="round"/><circle cx="16" cy="16" r="9.8" fill="url(#sun-fill)" stroke="#d8820a" stroke-width=".5"/><ellipse cx="11.4" cy="18.6" rx="1.7" ry="1.05" fill="#ff7a4d" opacity=".5"/><ellipse cx="20.6" cy="18.6" rx="1.7" ry="1.05" fill="#ff7a4d" opacity=".5"/><ellipse cx="13.1" cy="14.4" rx="1.4" ry="1.9" fill="#fff" stroke="#5a3200" stroke-width=".4"/><ellipse cx="18.9" cy="14.4" rx="1.4" ry="1.9" fill="#fff" stroke="#5a3200" stroke-width=".4"/><circle cx="13.4" cy="14.8" r=".9" fill="#3b2200"/><circle cx="19.2" cy="14.8" r=".9" fill="#3b2200"/><circle cx="13.75" cy="14.35" r=".32" fill="#fff"/><circle cx="19.55" cy="14.35" r=".32" fill="#fff"/><path d="M11.5 12Q12.6 10.5 14.6 11.2Q12.8 10.95 11.5 12ZM20.5 12Q19.4 10.5 17.4 11.2Q19.2 10.95 20.5 12Z" fill="#7a4300" stroke="#7a4300" stroke-width=".25" stroke-linejoin="round"/><path d="M12.7 18.4q3.3 4 6.6 0q-3.3 1.2-6.6 0Z" fill="#7a2e0e" stroke="#5a3200" stroke-width=".5" stroke-linejoin="round"/><path d="M14.5 20.3q1.5.85 3 0q-1.5-.75-3 0Z" fill="#ff7b72"/></svg>
+            <span class="theme-label">Dark Mode</span>
+        </button>
+    </aside>
+
+    <main class="main" id="top">
+
+        <!-- Hero: what the bundle is, the two ways into the page, and key figures -->
+        <section class="bundle-hero" aria-labelledby="bundle-title">
+            <p class="hero-kicker">Machine Learning Bundle</p>
+            <h1 id="bundle-title">Master Machine Learning Through Complete Projects</h1>
+            <p class="hero-lede">Jupyter notebooks that take every project from raw data to a fully evaluated model. Ready to run and easy to follow.</p>
+            <div class="hero-actions">
+                <a href="#bundles" class="btn btn-primary">See bundles</a>
+                <a href="#catalogue" class="btn btn-ghost">Browse projects</a>
+            </div>
+        </section>
+
+        <!-- Notebook shaped pricing cards of the tiers on sale beside a column of the tiers coming next -->
+        <section id="bundles" class="section">
+            <header class="section-head">
+                <h2>Choose Your Bundle</h2>
+                <p>More bundles unlock as the projects grow</p>
+            </header>
+            <div class="tier-grid" id="tier-grid"></div>
+        </section>
+
+        <!-- Folder explorer that shows what every project contains -->
+        <section id="inside" class="section">
+            <header class="section-head">
+                <h2>Inside a Project Folder</h2>
+                <p>Select a file to see what it holds</p>
+            </header>
+            <div class="explorer card">
+                <div class="explorer-tree">
+                    <p class="explorer-title">Project folder</p>
+                    <ul id="file-tree"></ul>
+                </div>
+                <div class="explorer-view" id="file-view" aria-live="polite"></div>
+            </div>
+        </section>
+
+        <!-- Project catalogue as one card with a menu of fields on the left and the projects of the chosen field listed on the right -->
+        <section id="catalogue" class="section">
+            <header class="section-head">
+                <h2>Project Catalogue</h2>
+                <p id="project-count"></p>
+            </header>
+            <div class="card catalog" id="catalog">
+                <div class="catalog-menu" id="catalog-menu" role="tablist" aria-label="Fields" aria-orientation="vertical"></div>
+                <div class="catalog-body" id="catalog-body" role="tabpanel"></div>
+            </div>
+        </section>
+
+        <!-- Buying steps on a timeline that fills while scrolling -->
+        <section id="buying" class="section">
+            <header class="section-head">
+                <h2>How to Buy</h2>
+                <p>Four steps through WhatsApp</p>
+            </header>
+            <ol class="buy-timeline" id="timeline"></ol>
+        </section>
+
+        <!-- Frequently asked questions -->
+        <section id="faq" class="section">
+            <header class="section-head">
+                <h2>Frequently Asked Questions</h2>
+            </header>
+            <div class="faq" id="faq-list"></div>
+        </section>
+
+        <footer class="footer">© 2026 Reyhan Ksatria Brahmacarya</footer>
+    </main>
+</div>
+
+<script src="data.js"></script>
+<script src="site.js"></script>
+<script src="bundle.js"></script>
+</body>
+</html>
