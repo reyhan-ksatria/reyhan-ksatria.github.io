@@ -83,6 +83,3 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden) star
 if (matchMedia("(pointer: fine)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
     addEventListener("pointermove", e => { const dx = e.clientX / innerWidth - 0.5, dy = e.clientY / innerHeight - 0.5; document.documentElement.style.setProperty("--px", dx.toFixed(3)); document.documentElement.style.setProperty("--py", dy.toFixed(3)); }, { passive: true });
 }
-
-// Each tap writes a hidden counter on the page, so mobile Chrome sees the tap as handled and a plain tap on text no longer opens Touch to Search
-let taps = 0; document.addEventListener("click", () => { document.documentElement.dataset.tap = ++taps; });
