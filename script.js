@@ -339,11 +339,11 @@ function setView(next) {
     updateZoomLevel();
 }
 
-// Zoom buttons scale the 2D window around its center or restore the full view, and hand over to the 3D camera in 3D mode
+// Zoom buttons scale the 2D window around the middle day and the curves at that day, so the curves stay in the center at any zoom, or restore the full view, and hand over to the 3D camera in 3D mode
 document.querySelectorAll("[data-zoom]").forEach(btn => btn.addEventListener("click", () => {
     if (viewMode === "3d") return zoom3d(btn.dataset.zoom);
     if (animating) return;
-    const mode = btn.dataset.zoom, f = mode === "in" ? 0.5 : 2, cx = (view.x0 + view.x1) / 2, cy = (view.y0 + view.y1) / 2;
+    const mode = btn.dataset.zoom, f = mode === "in" ? 0.5 : 2, cx = (view.x0 + view.x1) / 2, cy = (weibullS(cx) + kmS(cx)) / 2;
     setView(mode === "reset" ? fullView : { x0: cx - (view.x1 - view.x0) * f / 2, x1: cx + (view.x1 - view.x0) * f / 2, y0: cy - (view.y1 - view.y0) * f / 2, y1: cy + (view.y1 - view.y0) * f / 2 });
 }));
 
@@ -1001,12 +1001,11 @@ function render3d(now = performance.now()) {
     fitHud();
 }
 
-// Gentle idle loop at about 30 frames a second keeps stars twinkling and the converged sun breathing while the 3D view is visible and nothing else is animating, and rests while a player slider is being dragged so the slider stays responsive
-let lastIdle = 0, sliding = false;
-document.querySelectorAll(".player input[type=range]").forEach(s => { s.addEventListener("pointerdown", () => sliding = true); ["pointerup", "pointercancel", "change"].forEach(t => s.addEventListener(t, () => sliding = false)); });
+// Gentle idle loop at about 30 frames a second keeps stars twinkling and the converged sun breathing while the 3D view is visible and nothing else is animating
+let lastIdle = 0;
 function idle3d(now) {
     const r = canvas3d.getBoundingClientRect();
-    if (now - lastIdle > 33 && viewMode === "3d" && !playing && !drag3d && !sliding && r.bottom > 0 && r.top < innerHeight) { lastIdle = now; render3d(now); }
+    if (now - lastIdle > 33 && viewMode === "3d" && !playing && !drag3d && r.bottom > 0 && r.top < innerHeight) { lastIdle = now; render3d(now); }
     requestAnimationFrame(idle3d);
 }
 requestAnimationFrame(idle3d);
@@ -1066,12 +1065,7 @@ function play() { if (progress >= 1) progress = 0; endedAt = null; playing = tru
 function pause() { playing = false; cancelSn(); syncPlayer(); soundFrame(); }
 playBtn.addEventListener("click", () => playing ? pause() : play());
 durationSel.addEventListener("change", () => { if (playing) { playFrom = progress; playStart = performance.now(); } syncPlayer(); });
-// Dragging the progress slider redraws the scene at most once per screen frame, so fast drags on slower devices stay smooth instead of queueing full redraws
-let scrubFrame = 0;
-scrub.addEventListener("input", () => {
-    endedAt = null; progress = scrub.value / 1000; hud.hidden = false; if (playing) pause();
-    if (!scrubFrame) scrubFrame = requestAnimationFrame(() => { scrubFrame = 0; pause(); cam = cameraFor(progress); render3d(); syncPlayer(); });
-});
+scrub.addEventListener("input", () => { endedAt = null; progress = scrub.value / 1000; pause(); cam = cameraFor(progress); hud.hidden = false; render3d(); syncPlayer(); });
 
 // Sonification with the Web Audio API: everything is synthesized, nothing plays until the sound button is pressed
 const soundBtn = $("sound-3d");
@@ -1291,16 +1285,16 @@ function soundFrame() {
 // Playback start lines the trackers up with the current position so no stale events fire
 function soundReset() { const at = pathAt(progress); lastReached = at.reached; lastStep = playing ? -1 : at.i; lastShown = 0; cancelSn(); }
 
-// Site volume from 1 to 100 on a squared curve, independent of the device volume and remembered between visits; the label and gain follow the slider live while the value is saved only once the slider is released
+// Site volume from 1 to 100 on a squared curve, independent of the device volume and remembered between visits
 const volumeInput = $("volume-3d"), volumeLabel = $("volume-value");
 const volumeGain = () => 1.84 * (volumeInput.value / 100) ** 2;
 try { const v = localStorage.getItem("spaceVolume"); if (v) volumeInput.value = v; } catch (e) {}
 volumeLabel.textContent = volumeInput.value; fillRange(volumeInput);
-let volumeFrame = 0;
 volumeInput.addEventListener("input", () => {
-    if (!volumeFrame) volumeFrame = requestAnimationFrame(() => { volumeFrame = 0; volumeLabel.textContent = volumeInput.value; fillRange(volumeInput); if (audio && soundOn) audio.master.gain.setTargetAtTime(volumeGain(), audio.ac.currentTime, 0.05); });
+    volumeLabel.textContent = volumeInput.value; fillRange(volumeInput);
+    try { localStorage.setItem("spaceVolume", volumeInput.value); } catch (e) {}
+    if (audio && soundOn) audio.master.gain.setTargetAtTime(volumeGain(), audio.ac.currentTime, 0.05);
 });
-volumeInput.addEventListener("change", () => { try { localStorage.setItem("spaceVolume", volumeInput.value); } catch (e) {} });
 
 // Sound button creates the graph on first press, then fades the master in or out and suspends when silent
 soundBtn.addEventListener("click", async () => {
