@@ -90,3 +90,9 @@ if (location.protocol === "file:") {
     const fixLink = a => { const h = a.getAttribute("href"); if (h && toFile(h) !== h) a.setAttribute("href", toFile(h)); };
     document.querySelectorAll("a[href]").forEach(fixLink); document.addEventListener("click", e => { const a = e.target.closest?.("a[href]"); if (a) fixLink(a); }, true);
 }
+
+// Online, an old address such as /index.html#about or /bundle.html is quietly rewritten to its clean form without a reload, so links on the page show clean addresses too
+else {
+    const clean = location.pathname.replace(/\/index\.html$/, "/").replace(/\/bundle\.html$/, "/bundle");
+    if (clean !== location.pathname) history.replaceState(history.state, "", clean + location.search + location.hash);
+}
