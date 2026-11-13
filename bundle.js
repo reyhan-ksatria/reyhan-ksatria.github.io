@@ -3,7 +3,7 @@ const $ = id => document.getElementById(id);
 const rupiah = n => `Rp${n.toLocaleString("id-ID")}`;
 
 // WhatsApp chat link with a ready message naming the chosen bundle and its price
-const waLink = t => `https://wa.me/${bundle.whatsapp}?text=${encodeURIComponent(`Hi Reyhan, I would like to buy the Machine Learning Bundle (${t.name}) for ${rupiah(t.price)}.`)}`;
+const waLink = t => `https://wa.me/${bundle.whatsapp}?text=${encodeURIComponent(`Halo Reyhan, saya ingin membeli Machine Learning Bundle (${t.name}) seharga ${rupiah(t.price)}.`)}`;
 
 // Theme toggle flips the data-theme attribute, remembers the choice, and repaints the sky for the new theme
 const themeToggle = $("theme-toggle"), themeLabel = themeToggle.querySelector(".theme-label");
