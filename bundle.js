@@ -145,11 +145,13 @@ $("faq-list").innerHTML = bundle.faq.map(f => `<details><summary>${f.q}</summary
 addEventListener("scroll", () => { syncProgress(); syncTimeline(); }, { passive: true });
 placeNavIndicator(); syncProgress(); syncTimeline(); document.fonts?.ready.then(placeNavIndicator);
 
-// Once a scrolling box in the explorer or the catalogue reaches its top or bottom, the rest of the same mouse or touchpad gesture moves the page instead of stopping
+// Once a scrolling box in the explorer or the catalogue reaches its top or bottom, the rest of the same mouse or touchpad gesture glides the page on with an easing glide frame by frame instead of stopping or jumping
+let wheelLeft = 0, wheelRun = false;
+const glidePage = () => { const step = Math.abs(wheelLeft) < 1 ? wheelLeft : wheelLeft * 0.18; scrollBy({ top: step, behavior: "instant" }); wheelLeft -= step; wheelRun = Math.abs(wheelLeft) > 0.1; if (wheelRun) requestAnimationFrame(glidePage); else wheelLeft = 0; };
 const passWheel = e => {
     const box = e.target.closest?.(".file-scroll, .catalog-scroll"); if (!box || e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
     const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1), atTop = box.scrollTop <= 0, atEnd = box.scrollTop + box.clientHeight >= box.scrollHeight - 1;
-    if ((dy > 0 && atEnd) || (dy < 0 && atTop)) { e.preventDefault(); scrollBy({ top: dy, behavior: "instant" }); }
+    if ((dy > 0 && atEnd) || (dy < 0 && atTop)) { e.preventDefault(); if (Math.sign(dy) !== Math.sign(wheelLeft)) wheelLeft = 0; wheelLeft += dy; if (!wheelRun) { wheelRun = true; requestAnimationFrame(glidePage); } }
 };
 ["file-view", "catalog-body"].forEach(id => $(id).addEventListener("wheel", passWheel, { passive: false }));
 
