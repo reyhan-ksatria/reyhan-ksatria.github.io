@@ -145,19 +145,6 @@ $("faq-list").innerHTML = bundle.faq.map(f => `<details><summary>${f.q}</summary
 addEventListener("scroll", () => { syncProgress(); syncTimeline(); }, { passive: true });
 placeNavIndicator(); syncProgress(); syncTimeline(); document.fonts?.ready.then(placeNavIndicator);
 
-// Scrolling over a box in the explorer or the catalogue moves the box first and hands whatever is left straight on to the page, so reaching the edge of the box feels like one continuous scroll; the small steady steps of a touchpad pass through as they come since they are already smooth, while the large steps of a mouse wheel are eased over a few frames
-let wheelLeft = 0, wheelRun = false, wheelBox = null;
-const spendWheel = d => { const room = d > 0 ? wheelBox.scrollHeight - wheelBox.clientHeight - wheelBox.scrollTop : -wheelBox.scrollTop, inBox = d > 0 ? Math.min(d, Math.max(0, room)) : Math.max(d, Math.min(0, room)); if (inBox) wheelBox.scrollTop += inBox; if (d - inBox) scrollBy({ top: d - inBox, behavior: "instant" }); };
-const glideWheel = () => { const step = Math.abs(wheelLeft) < 1 ? wheelLeft : wheelLeft * 0.3; spendWheel(step); wheelLeft -= step; wheelRun = Math.abs(wheelLeft) > 0.1; if (wheelRun) requestAnimationFrame(glideWheel); else wheelLeft = 0; };
-const passWheel = e => {
-    const box = e.target.closest?.(".file-scroll, .catalog-scroll"); if (!box || e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
-    const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1); e.preventDefault();
-    if (box !== wheelBox || Math.sign(dy) !== Math.sign(wheelLeft)) wheelLeft = 0; wheelBox = box;
-    if (Math.abs(dy) < 50 && !wheelRun) { spendWheel(dy); return; }
-    const now = dy * 0.3; spendWheel(now); wheelLeft += dy - now; if (!wheelRun) { wheelRun = true; requestAnimationFrame(glideWheel); }
-};
-["file-view", "catalog-body"].forEach(id => $(id).addEventListener("wheel", passWheel, { passive: false }));
-
 // A reload or a Back or Forward visit brings the visitor back to where they were in this tab: the scroll position, the field open in the catalogue, and the file open in the explorer; a new visit starts at the top
 const stateKey = "bundle-state", isReturn = ["reload", "back_forward"].includes(performance.getEntriesByType?.("navigation")[0]?.type);
 addEventListener("pagehide", () => { try { sessionStorage.setItem(stateKey, JSON.stringify({ y: scrollY, field: fieldOpen, file: currentFile })); } catch (e) {} });
