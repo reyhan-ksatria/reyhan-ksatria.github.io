@@ -1420,7 +1420,7 @@ function intro3d() {
 // Switch between the 2D fit and the 3D likelihood view, swapping titles, legends, and canvases
 let viewMode = "2d";
 const viewText = {
-    "2d": ["Weibull Fit against Kaplan–Meier", "Lifetime data of 228 lung cancer patients with 63 right-censored observations"],
+    "2d": ["Weibull Fit Against Kaplan–Meier", "Lifetime data of 228 lung cancer patients with 63 right-censored observations"],
     "3d": ["BFGS on the Log-Likelihood Surface", "Each point is one iteration from the starting value to convergence"]
 };
 document.querySelectorAll("[data-view]").forEach(btn => btn.addEventListener("click", () => {
