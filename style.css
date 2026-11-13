@@ -743,10 +743,10 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .file-scroll::-webkit-scrollbar-thumb { border-radius: 6px; background: color-mix(in srgb, var(--c) 45%, transparent); }
 .file-scroll::-webkit-scrollbar-track { background: transparent; }
 .file-scroll > p { max-width: 60ch; color: var(--muted); line-height: 1.7; }
-/* Images panel: thumbnails styled like saved notebook figures that draw themselves in when the folder opens */
+/* Images panel: still thumbnails styled like saved notebook figures, shown at once without any motion */
 .chart-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 18px; list-style: none; }
-.chart-grid li { display: grid; grid-template-rows: auto 1fr; align-content: start; gap: 10px; padding: 10px 10px 12px; border: 1px solid var(--glass-line); border-radius: 12px; background: color-mix(in srgb, var(--ink) 3%, transparent); text-align: center; animation: readmeIn .45s cubic-bezier(.2, .7, .2, 1) both; animation-delay: calc(var(--i) * 50ms); transition: border-color .2s, transform .2s; }
-.chart-grid li:hover { border-color: color-mix(in srgb, var(--amber) 45%, transparent); transform: translateY(-2px); }
+.chart-grid li { display: grid; grid-template-rows: auto 1fr; align-content: start; gap: 10px; padding: 10px 10px 12px; border: 1px solid var(--glass-line); border-radius: 12px; background: color-mix(in srgb, var(--ink) 3%, transparent); text-align: center; }
+.chart-grid li:hover { border-color: color-mix(in srgb, var(--amber) 45%, transparent); }
 .chart-grid span { font-size: 13.5px; font-weight: 600; line-height: 1.35; }
 .chart-thumb { width: 100%; height: auto; aspect-ratio: 120 / 72; border-radius: 8px; box-shadow: 0 0 0 1px rgba(0, 0, 0, .08); fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .ct-paper { fill: #fdfdfe; }
@@ -755,16 +755,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .ct-text { stroke: #8f96a3; stroke-width: 2.2; }
 .ct-ref { stroke-width: 1.2; stroke-dasharray: 3 2.5; }
 .ct-whisk { stroke: #555; stroke-width: 1.1; }
-.ct-bar { transform-origin: bottom; transform-box: fill-box; animation: ctGrow .6s cubic-bezier(.2, .7, .2, 1) both; animation-delay: calc(var(--i) * 50ms + var(--j) * 40ms + .15s); }
-.ct-cell { animation: ctFade .4s both; animation-delay: calc(var(--i) * 50ms + var(--j) * 18ms + .15s); }
-.ct-dot { stroke: none; transform-origin: center; transform-box: fill-box; animation: ctPop .35s cubic-bezier(.3, 1.5, .5, 1) both; animation-delay: calc(var(--i) * 50ms + var(--j) * 22ms + .15s); }
-.ct-line { stroke-width: 1.8; stroke-dasharray: 1; stroke-dashoffset: 1; animation: ctDraw 1s cubic-bezier(.4, 0, .2, 1) forwards; animation-delay: calc(var(--i) * 50ms + .25s); }
-.ct-line.is-late { animation-delay: calc(var(--i) * 50ms + .9s); }
-@keyframes ctGrow { from { transform: scaleY(0); } to { transform: none; } }
-@keyframes ctFade { from { opacity: 0; } }
-@keyframes ctPop { from { transform: scale(0); } to { transform: none; } }
-@keyframes ctDraw { to { stroke-dashoffset: 0; } }
-@media (prefers-reduced-motion: reduce) { .chart-grid li, .ct-bar, .ct-cell, .ct-dot { animation: none; } .ct-line { animation: none; stroke-dashoffset: 0; } }
+.ct-dot { stroke: none; }
+.ct-line { stroke-width: 1.8; }
 
 /* README panel: the sections in reading order on a numbered rail that rises in one by one */
 .readme-list { position: relative; display: grid; margin-top: 18px; list-style: none; }

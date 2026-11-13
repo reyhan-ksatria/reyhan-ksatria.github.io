@@ -354,7 +354,7 @@ plotSvg.addEventListener("pointerdown", e => {
     brushStart = p; plotSvg.setPointerCapture(e.pointerId); hideCursor();
 });
 plotSvg.addEventListener("pointermove", e => {
-    if (animating) return;
+    if (animating || pinch) return;
     const p = svgPoint(e);
     if (brushStart) {
         const x = Math.max(pad.l, Math.min(PW - pad.r, p.x)), y = Math.max(pad.t, Math.min(PH - pad.b, p.y));
@@ -372,6 +372,26 @@ plotSvg.addEventListener("pointerup", e => {
 });
 plotSvg.addEventListener("pointerleave", () => { if (!brushStart && !animating) hideCursor(); });
 plotSvg.addEventListener("dblclick", () => { if (!animating) setView(fullView); });
+
+// On touch screens two fingers pinch to zoom and move together to pan, keeping the data under the fingers in place, while one finger still scrolls the page and taps to read values
+let pinch = null, pinchFrame = 0, pinchTouches = null;
+const touchPoints = ts => { const a = svgPoint(ts[0]), b = svgPoint(ts[1]); return { c: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, d: Math.max(1, Math.hypot(a.x - b.x, a.y - b.y)) }; };
+const applyPinch = () => {
+    pinchFrame = 0; if (!pinch || !pinchTouches) return;
+    const { c, d } = touchPoints(pinchTouches), { v, c: c0, d: d0 } = pinch, s = d0 / d, w0 = v.x1 - v.x0, h0 = v.y1 - v.y0;
+    const t = v.x0 + (c0.x - pad.l) / innerW * w0, p = v.y1 - (c0.y - pad.t) / innerH * h0, x0 = t - (c.x - pad.l) / innerW * w0 * s, y1 = p + (c.y - pad.t) / innerH * h0 * s;
+    setView({ x0, x1: x0 + w0 * s, y0: y1 - h0 * s, y1 });
+};
+plotSvg.addEventListener("touchstart", e => {
+    if (e.touches.length !== 2 || animating) return;
+    e.preventDefault(); hideCursor(); brushStart = null; pinch = { v: { ...view }, ...touchPoints(e.touches) };
+}, { passive: false });
+plotSvg.addEventListener("touchmove", e => {
+    if (!pinch || e.touches.length !== 2) return;
+    e.preventDefault(); pinchTouches = [e.touches[0], e.touches[1]]; if (!pinchFrame) pinchFrame = requestAnimationFrame(applyPinch);
+}, { passive: false });
+const endPinch = e => { if (pinch && e.touches.length < 2) { pinch = null; pinchTouches = null; } };
+plotSvg.addEventListener("touchend", endPinch); plotSvg.addEventListener("touchcancel", endPinch);
 
 // Negative log-likelihood of the Weibull model on the thesis data, the same objective the notebook minimizes
 const negLogLik = (k, tau) => { let f = 0; for (const [t, d] of thesisData) f += (t / tau) ** k - d * (Math.log(k) + (k - 1) * Math.log(t) - k * Math.log(tau)); return f; };
@@ -981,11 +1001,12 @@ function render3d(now = performance.now()) {
     fitHud();
 }
 
-// Gentle idle loop at about 30 frames a second keeps stars twinkling and the converged sun breathing while the 3D view is visible and nothing else is animating
-let lastIdle = 0;
+// Gentle idle loop at about 30 frames a second keeps stars twinkling and the converged sun breathing while the 3D view is visible and nothing else is animating, and rests while a player slider is being dragged so the slider stays responsive
+let lastIdle = 0, sliding = false;
+document.querySelectorAll(".player input[type=range]").forEach(s => { s.addEventListener("pointerdown", () => sliding = true); ["pointerup", "pointercancel", "change"].forEach(t => s.addEventListener(t, () => sliding = false)); });
 function idle3d(now) {
     const r = canvas3d.getBoundingClientRect();
-    if (now - lastIdle > 33 && viewMode === "3d" && !playing && !drag3d && r.bottom > 0 && r.top < innerHeight) { lastIdle = now; render3d(now); }
+    if (now - lastIdle > 33 && viewMode === "3d" && !playing && !drag3d && !sliding && r.bottom > 0 && r.top < innerHeight) { lastIdle = now; render3d(now); }
     requestAnimationFrame(idle3d);
 }
 requestAnimationFrame(idle3d);
@@ -1045,7 +1066,12 @@ function play() { if (progress >= 1) progress = 0; endedAt = null; playing = tru
 function pause() { playing = false; cancelSn(); syncPlayer(); soundFrame(); }
 playBtn.addEventListener("click", () => playing ? pause() : play());
 durationSel.addEventListener("change", () => { if (playing) { playFrom = progress; playStart = performance.now(); } syncPlayer(); });
-scrub.addEventListener("input", () => { endedAt = null; progress = scrub.value / 1000; pause(); cam = cameraFor(progress); hud.hidden = false; render3d(); syncPlayer(); });
+// Dragging the progress slider redraws the scene at most once per screen frame, so fast drags on slower devices stay smooth instead of queueing full redraws
+let scrubFrame = 0;
+scrub.addEventListener("input", () => {
+    endedAt = null; progress = scrub.value / 1000; hud.hidden = false; if (playing) pause();
+    if (!scrubFrame) scrubFrame = requestAnimationFrame(() => { scrubFrame = 0; pause(); cam = cameraFor(progress); render3d(); syncPlayer(); });
+});
 
 // Sonification with the Web Audio API: everything is synthesized, nothing plays until the sound button is pressed
 const soundBtn = $("sound-3d");
@@ -1265,16 +1291,16 @@ function soundFrame() {
 // Playback start lines the trackers up with the current position so no stale events fire
 function soundReset() { const at = pathAt(progress); lastReached = at.reached; lastStep = playing ? -1 : at.i; lastShown = 0; cancelSn(); }
 
-// Site volume from 1 to 100 on a squared curve, independent of the device volume and remembered between visits
+// Site volume from 1 to 100 on a squared curve, independent of the device volume and remembered between visits; the label and gain follow the slider live while the value is saved only once the slider is released
 const volumeInput = $("volume-3d"), volumeLabel = $("volume-value");
 const volumeGain = () => 1.84 * (volumeInput.value / 100) ** 2;
 try { const v = localStorage.getItem("spaceVolume"); if (v) volumeInput.value = v; } catch (e) {}
 volumeLabel.textContent = volumeInput.value; fillRange(volumeInput);
+let volumeFrame = 0;
 volumeInput.addEventListener("input", () => {
-    volumeLabel.textContent = volumeInput.value; fillRange(volumeInput);
-    try { localStorage.setItem("spaceVolume", volumeInput.value); } catch (e) {}
-    if (audio && soundOn) audio.master.gain.setTargetAtTime(volumeGain(), audio.ac.currentTime, 0.05);
+    if (!volumeFrame) volumeFrame = requestAnimationFrame(() => { volumeFrame = 0; volumeLabel.textContent = volumeInput.value; fillRange(volumeInput); if (audio && soundOn) audio.master.gain.setTargetAtTime(volumeGain(), audio.ac.currentTime, 0.05); });
 });
+volumeInput.addEventListener("change", () => { try { localStorage.setItem("spaceVolume", volumeInput.value); } catch (e) {} });
 
 // Sound button creates the graph on first press, then fades the master in or out and suspends when silent
 soundBtn.addEventListener("click", async () => {
