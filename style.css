@@ -931,6 +931,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
     .catalog-item .field-icon { width: 28px; height: 28px; padding: 5px; border-radius: 8px; }
     .catalog-body { padding: 18px 16px 8px; }
     .catalog-head h3 { font-size: 23px; }
+    .file-scroll, .catalog-scroll { overscroll-behavior: auto; }
 }
 
 /* Wide screens give the main column a little more room */
