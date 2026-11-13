@@ -185,11 +185,14 @@ function syncActiveLink() {
 }
 addEventListener("scroll", syncActiveLink, { passive: true });
 
-// The indicator glides to the active link, vertically in the sidebar and horizontally in the top bar on small screens
+// The indicator glides to the active link, vertically in the sidebar and horizontally in the top bar on small screens, where the bar also slides sideways to bring a newly active link to the middle
+let navShown = null;
 function placeNavIndicator() {
     const ind = $("nav-indicator"), active = document.querySelector(".nav-link.active");
     if (!ind || !active) return;
     ind.style.transform = `translate(${active.offsetLeft}px, ${active.offsetTop}px)`; ind.style.width = `${active.offsetWidth}px`; ind.style.height = `${active.offsetHeight}px`;
+    const nav = active.parentElement;
+    if (active !== navShown && nav.scrollWidth > nav.clientWidth) { nav.scrollTo({ left: active.offsetLeft - (nav.clientWidth - active.offsetWidth) / 2, behavior: navShown ? "smooth" : "instant" }); navShown = active; }
 }
 addEventListener("resize", placeNavIndicator);
 

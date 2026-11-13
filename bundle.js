@@ -16,11 +16,14 @@ themeToggle.addEventListener("click", () => {
 });
 syncThemeLabel();
 
-// Sidebar indicator sits on the active link and the top bar shows how far the page has scrolled
+// Sidebar indicator sits on the active link, the top bar on small screens slides sideways so the active link sits in the middle, and the progress bar shows how far the page has scrolled
+let navShown = null;
 function placeNavIndicator() {
     const ind = $("nav-indicator"), active = document.querySelector(".nav-link.active");
     if (!ind || !active) return;
     ind.style.transform = `translate(${active.offsetLeft}px, ${active.offsetTop}px)`; ind.style.width = `${active.offsetWidth}px`; ind.style.height = `${active.offsetHeight}px`;
+    const nav = active.parentElement;
+    if (active !== navShown && nav.scrollWidth > nav.clientWidth) { nav.scrollTo({ left: active.offsetLeft - (nav.clientWidth - active.offsetWidth) / 2, behavior: navShown ? "smooth" : "instant" }); navShown = active; }
 }
 const syncProgress = () => { const max = document.documentElement.scrollHeight - innerHeight; $("scroll-progress").style.transform = `scaleX(${max > 0 ? Math.min(1, scrollY / max) : 0})`; };
 addEventListener("resize", placeNavIndicator);
