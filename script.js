@@ -380,9 +380,12 @@ const negLogLik = (k, tau) => { let f = 0; for (const [t, d] of thesisData) f +=
 const canvas3d = $("likelihood-3d"), ctx3d = canvas3d.getContext("2d"), hud = $("hud-3d");
 let fsScale = 1, fsBase = null;
 
-// Keep the iteration readout on one line beside the full screen button, easing its font down slightly when needed and wrapping only on charts too narrow for one line
+// Keep the iteration readout on one line beside the full screen button, easing its font down slightly when needed and wrapping only on charts too narrow for one line; in the two column phone strip the step size moves to a row of its own only when its line search note is too long to fit beside the gradient norm
 const fitHud = () => {
-    hud.style.cssText = ""; let size = parseFloat(getComputedStyle(hud).fontSize); const floor = size - 2;
+    const alpha = hud.lastElementChild; alpha?.classList.remove("is-wide"); hud.style.cssText = "";
+    const hs = getComputedStyle(hud), limit = hud.getBoundingClientRect().right - parseFloat(hs.paddingRight) + 1;
+    if (alpha && hs.display === "grid" && alpha.getBoundingClientRect().right > limit) alpha.classList.add("is-wide");
+    let size = parseFloat(getComputedStyle(hud).fontSize); const floor = size - 2;
     while (hud.scrollWidth > hud.clientWidth + 1 && size > floor) { size -= 0.5; hud.style.fontSize = `${size}px`; }
     if (hud.scrollWidth > hud.clientWidth + 1) hud.style.cssText = "white-space: normal; flex-wrap: wrap;";
 };

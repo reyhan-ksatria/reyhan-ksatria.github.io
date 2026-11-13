@@ -86,7 +86,7 @@ let currentFile = 0;
 function showFile(i) {
     const f = bundle.files[i]; currentFile = i;
     $("file-view").innerHTML = `<div class="file-view-head">${fileIcon(f)}<h3>${f.name}${f.icon === "folder" ? "/" : ""}</h3></div><div class="file-scroll"><p>${f.text}</p>${f.icon === "notebook" ? `<ul class="highlights">${bundle.features.map(x => `<li><b>${x.title}</b><span>${x.text}</span></li>`).join("")}</ul>` : ""}${f.charts ? `<ul class="chart-grid">${f.charts.map((c, i) => `<li style="--i: ${i}">${chartThumb(c)}<span>${c.title}</span></li>`).join("")}</ul>` : ""}${f.sections ? `<ol class="readme-list">${f.sections.map((x, i) => `<li style="--i: ${i}"><span class="readme-num">${String(i + 1).padStart(2, "0")}</span><div><b>${x.title}</b><span>${x.text}</span>${x.tags ? `<p class="readme-tags">${x.tags.map((t, j) => `<em${j === x.tags.length - 1 ? ' class="is-overall"' : ""}>${t}</em>`).join("")}</p>` : ""}</div></li>`).join("")}</ol>` : ""}${f.flow ? ckptFlow : ""}${f.items ? `<ul class="extra-list">${f.items.map((x, i) => `<li style="--i: ${i}">${fileIcon(x)}<div><b>${x.name}${x.ext ? `<span class="ext-chips">${x.ext.map(e => `<code>${e}</code>`).join("")}</span>` : ""}</b><span>${x.text}</span></div></li>`).join("")}</ul>` : ""}</div>`;
-    const box = $("file-view").querySelector(".file-scroll"), edge = () => box.classList.toggle("at-end", box.scrollTop + box.clientHeight >= box.scrollHeight - 4); box.addEventListener("scroll", edge, { passive: true }); edge();
+    const box = $("file-view").querySelector(".file-scroll"), edge = () => box.classList.toggle("at-end", box.scrollTop + box.clientHeight >= box.scrollHeight - 4); box.addEventListener("scroll", edge, { passive: true }); box.addEventListener("animationend", edge); edge();
     document.querySelectorAll("#file-tree button").forEach(b => b.setAttribute("aria-pressed", b.dataset.file === String(i)));
 }
 $("file-tree").addEventListener("click", e => { const b = e.target.closest("button"); if (b) showFile(+b.dataset.file); });
@@ -111,7 +111,7 @@ function showField(f, smooth = true) {
     $("catalog-body").innerHTML = `<div class="catalog-mark" aria-hidden="true">${fieldIcon(f)}</div><div class="catalog-head"><h3>${fieldIcon(f)}${f}</h3><p>${n} of ${bundle.projects.length} projects</p></div><div class="catalog-scroll"><ol class="catalog-list">${inField(f).map(catalogRow).join("")}</ol></div>`;
     // Shift the watermark so the drawn shape is centered in its box for every field
     const mark = $("catalog-body").querySelector(".catalog-mark svg"), bb = mark.getBBox(), vb = mark.viewBox.baseVal, k = mark.getBoundingClientRect().width / vb.width; mark.style.transform = `translate(${(vb.x + vb.width / 2 - bb.x - bb.width / 2) * k}px, ${(vb.y + vb.height / 2 - bb.y - bb.height / 2) * k}px)`;
-    const box = $("catalog-body").querySelector(".catalog-scroll"), edge = () => box.classList.toggle("at-end", box.scrollTop + box.clientHeight >= box.scrollHeight - 4); box.addEventListener("scroll", edge, { passive: true }); edge();
+    const box = $("catalog-body").querySelector(".catalog-scroll"), edge = () => box.classList.toggle("at-end", box.scrollTop + box.clientHeight >= box.scrollHeight - 4); box.addEventListener("scroll", edge, { passive: true }); box.addEventListener("animationend", edge); edge();
     if (!smooth) { void $("catalog").offsetWidth; $("catalog").classList.remove("no-anim"); }
 }
 
