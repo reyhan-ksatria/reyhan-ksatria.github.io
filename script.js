@@ -288,7 +288,7 @@ function animateReveal() {
 
 // Zoom text shows one factor when both axes match, otherwise time and probability separately
 const zoomText = (zx, zy) => Math.abs(zx - zy) / zy < 0.05 ? `Zoom ${zx.toFixed(1)}×` : `Zoom ${zx.toFixed(1)}× <small>time</small> ${zy.toFixed(1)}× <small>probability</small>`;
-const zoomFactors = (w, h) => [(fullView.x1 - fullView.x0) / Math.max(20, w), (fullView.y1 - fullView.y0) / Math.max(0.02, h)];
+const zoomFactors = (w, h, minW = 20, minH = 0.02) => [(fullView.x1 - fullView.x0) / Math.max(minW, w), (fullView.y1 - fullView.y0) / Math.max(minH, h)];
 
 // A non-increasing curve misses the box [a, b] x [lo, hi] when it is above it at b or below it at a
 const curveMisses = (f, a, b, lo, hi) => f(b) > hi || f(a) < lo;
@@ -309,7 +309,7 @@ function placeZoomBadge(label) {
 
 // Zoom badge shows the current factor relative to the full chart and stays hidden at full scale
 function updateZoomLevel() {
-    const [zx, zy] = zoomFactors(view.x1 - view.x0, view.y1 - view.y0), label = $("zoom-level");
+    const [zx, zy] = zoomFactors(view.x1 - view.x0, view.y1 - view.y0, 1e-6, 1e-9), label = $("zoom-level");
     label.hidden = true;
     if (zx <= 1.001 && zy <= 1.001) return;
     label.innerHTML = zoomText(zx, zy);
@@ -330,21 +330,32 @@ function showBrushLevel(x, y) {
     label.hidden = false;
 }
 
-// Clamp a requested window to the data domain and keep a minimum size, then redraw
-function setView(next) {
-    const w = Math.max(20, Math.min(fullView.x1, next.x1 - next.x0)), h = Math.max(0.02, Math.min(fullView.y1, next.y1 - next.y0));
+// Clamp a requested window to the data domain and keep a minimum size, which the zoom buttons set much smaller since they check the curves themselves
+const clampView = (next, minW = 20, minH = 0.02) => {
+    const w = Math.max(minW, Math.min(fullView.x1, next.x1 - next.x0)), h = Math.max(minH, Math.min(fullView.y1, next.y1 - next.y0));
     const x0 = Math.min(Math.max(fullView.x0, next.x0), fullView.x1 - w), y0 = Math.min(Math.max(fullView.y0, next.y0), fullView.y1 - h);
-    view = { x0, x1: x0 + w, y0, y1: y0 + h };
+    return { x0, x1: x0 + w, y0, y1: y0 + h };
+};
+
+// Apply a window and redraw
+function setView(next, minW, minH) {
+    view = clampView(next, minW, minH);
     renderPlot();
     updateZoomLevel();
 }
 
-// Zoom buttons scale the 2D window around the middle day and the curves at that day, so the curves stay in the center at any zoom, or restore the full view, and hand over to the 3D camera in 3D mode
+// True when both Kaplan–Meier and Weibull still pass through a window, sampled across its days
+const bothCurvesIn = v => { let w = false, k = false; for (let q = 0; q <= 80 && !(w && k); q++) { const t = v.x0 + q / 80 * (v.x1 - v.x0), a = weibullS(t), b = kmS(t); w ||= a >= v.y0 && a <= v.y1; k ||= b >= v.y0 && b <= v.y1; } return w && k; };
+
+// Zoom buttons scale the 2D window around the middle day and the curves at that day, so the curves stay in the center, stop zooming in just before either curve would leave the window, restore the full view, and hand over to the 3D camera in 3D mode
 document.querySelectorAll("[data-zoom]").forEach(btn => btn.addEventListener("click", () => {
     if (viewMode === "3d") return zoom3d(btn.dataset.zoom);
     if (animating) return;
     const mode = btn.dataset.zoom, f = mode === "in" ? 0.5 : 2, cx = (view.x0 + view.x1) / 2, cy = (weibullS(cx) + kmS(cx)) / 2;
-    setView(mode === "reset" ? fullView : { x0: cx - (view.x1 - view.x0) * f / 2, x1: cx + (view.x1 - view.x0) * f / 2, y0: cy - (view.y1 - view.y0) * f / 2, y1: cy + (view.y1 - view.y0) * f / 2 });
+    if (mode === "reset") return setView(fullView);
+    const next = clampView({ x0: cx - (view.x1 - view.x0) * f / 2, x1: cx + (view.x1 - view.x0) * f / 2, y0: cy - (view.y1 - view.y0) * f / 2, y1: cy + (view.y1 - view.y0) * f / 2 }, 1e-6, 1e-9);
+    if (mode === "in" && !bothCurvesIn(next)) return;
+    setView(next, 1e-6, 1e-9);
 }));
 
 // Mouse drag draws a brush rectangle and zooms into it on release
