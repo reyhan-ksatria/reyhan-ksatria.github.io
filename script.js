@@ -706,9 +706,9 @@ function modelEllipse({ k, tau, g, B }) {
 const maeFor = (k, tau) => thesisKM.reduce((acc, [t, sv]) => acc + Math.abs(sv - Math.exp(-((t / tau) ** k))), 0) / thesisKM.length;
 const maeStart = maeFor(bfgsPath[0][1], bfgsPath[0][2]), maeEnd = maeFor(bfgsPath[lastIter][1], bfgsPath[lastIter][2]);
 
-// Small inset chart drawn on the canvas: Kaplan–Meier steps and the Weibull curve for the parameters the comet carries right now, in the dark theme chart colors since the canvas is always dark
+// Small inset chart drawn on the canvas: Kaplan–Meier steps and the Weibull curve for the parameters the comet carries right now, in the dark theme chart colors since the canvas is always dark; on narrow charts the MAE sits on its own line under the title
 function drawFitInset(k, tau, W, H, dpr, body) {
-    const w = (W / dpr < 520 ? 170 : 230) * dpr, h = (W / dpr < 520 ? 104 : 132) * dpr, x0 = 12 * dpr, y0 = 12 * dpr, pl = 10 * dpr, pt = 24 * dpr, pb = 10 * dpr, iw = w - 2 * pl, ih = h - pt - pb, tMax = 900;
+    const narrow = W / dpr < 520, w = (narrow ? 170 : 230) * dpr, h = (narrow ? 118 : 132) * dpr, x0 = 12 * dpr, y0 = 12 * dpr, pl = 10 * dpr, pt = (narrow ? 38 : 24) * dpr, pb = 10 * dpr, iw = w - 2 * pl, ih = h - pt - pb, tMax = 900;
     ctx3d.fillStyle = "rgba(8, 12, 30, 0.62)"; ctx3d.strokeStyle = "rgba(140, 170, 255, 0.18)"; ctx3d.lineWidth = dpr;
     ctx3d.beginPath(); ctx3d.roundRect(x0, y0, w, h, 10 * dpr); ctx3d.fill(); ctx3d.stroke();
     const X = t => x0 + pl + t / tMax * iw, Y = v => y0 + pt + (1 - v) * ih;
@@ -719,7 +719,7 @@ function drawFitInset(k, tau, W, H, dpr, body) {
     for (let q = 0; q <= 60; q++) { const t = q / 60 * tMax, v = Math.exp(-((t / tau) ** k)); q ? ctx3d.lineTo(X(t), Y(v)) : ctx3d.moveTo(X(t), Y(v)); }
     ctx3d.stroke();
     ctx3d.font = `${10.5 * dpr}px ${body}`; ctx3d.textBaseline = "middle"; ctx3d.textAlign = "left"; ctx3d.fillStyle = "#9aa6cc"; ctx3d.fillText("Fit at This Step", x0 + pl, y0 + 12 * dpr);
-    ctx3d.textAlign = "right"; ctx3d.fillStyle = "#eef2ff"; ctx3d.fillText(`MAE = ${maeFor(k, tau).toFixed(6)}`, x0 + w - pl, y0 + 12 * dpr);
+    ctx3d.textAlign = narrow ? "left" : "right"; ctx3d.fillStyle = "#eef2ff"; ctx3d.fillText(`MAE = ${maeFor(k, tau).toFixed(6)}`, narrow ? x0 + pl : x0 + w - pl, y0 + (narrow ? 26 : 12) * dpr);
 }
 
 // Draw space, the glowing likelihood grid, contour rings, the sun at the optimum, past iterates as stars, and the comet in flight
