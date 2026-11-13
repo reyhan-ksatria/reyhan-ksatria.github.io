@@ -145,6 +145,14 @@ $("faq-list").innerHTML = bundle.faq.map(f => `<details><summary>${f.q}</summary
 addEventListener("scroll", () => { syncProgress(); syncTimeline(); }, { passive: true });
 placeNavIndicator(); syncProgress(); syncTimeline(); document.fonts?.ready.then(placeNavIndicator);
 
+// Once a scrolling box in the explorer or the catalogue reaches its top or bottom, the rest of the same mouse or touchpad gesture moves the page instead of stopping
+const passWheel = e => {
+    const box = e.target.closest?.(".file-scroll, .catalog-scroll"); if (!box || e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1), atTop = box.scrollTop <= 0, atEnd = box.scrollTop + box.clientHeight >= box.scrollHeight - 1;
+    if ((dy > 0 && atEnd) || (dy < 0 && atTop)) { e.preventDefault(); scrollBy({ top: dy, behavior: "instant" }); }
+};
+["file-view", "catalog-body"].forEach(id => $(id).addEventListener("wheel", passWheel, { passive: false }));
+
 // A reload or a Back or Forward visit brings the visitor back to where they were in this tab: the scroll position, the field open in the catalogue, and the file open in the explorer; a new visit starts at the top
 const stateKey = "bundle-state", isReturn = ["reload", "back_forward"].includes(performance.getEntriesByType?.("navigation")[0]?.type);
 addEventListener("pagehide", () => { try { sessionStorage.setItem(stateKey, JSON.stringify({ y: scrollY, field: fieldOpen, file: currentFile })); } catch (e) {} });
