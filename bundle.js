@@ -145,13 +145,15 @@ $("faq-list").innerHTML = bundle.faq.map(f => `<details><summary>${f.q}</summary
 addEventListener("scroll", () => { syncProgress(); syncTimeline(); }, { passive: true });
 placeNavIndicator(); syncProgress(); syncTimeline(); document.fonts?.ready.then(placeNavIndicator);
 
-// Once a scrolling box in the explorer or the catalogue reaches its top or bottom, the rest of the same mouse or touchpad gesture moves the page at once by part of each step and glides the remainder over the next frames, so the handoff neither stops nor jumps
-let wheelLeft = 0, wheelRun = false;
-const glidePage = () => { const step = Math.abs(wheelLeft) < 1 ? wheelLeft : wheelLeft * 0.35; scrollBy({ top: step, behavior: "instant" }); wheelLeft -= step; wheelRun = Math.abs(wheelLeft) > 0.1; if (wheelRun) requestAnimationFrame(glidePage); else wheelLeft = 0; };
+// Mouse and touchpad scrolling over a box in the explorer or the catalogue runs through one easing motion that moves the box first and hands whatever is left straight on to the page, so reaching the edge of the box feels like one continuous scroll
+let wheelLeft = 0, wheelRun = false, wheelBox = null;
+const spendWheel = d => { const room = d > 0 ? wheelBox.scrollHeight - wheelBox.clientHeight - wheelBox.scrollTop : -wheelBox.scrollTop, inBox = d > 0 ? Math.min(d, Math.max(0, room)) : Math.max(d, Math.min(0, room)); if (inBox) wheelBox.scrollTop += inBox; if (d - inBox) scrollBy({ top: d - inBox, behavior: "instant" }); };
+const glideWheel = () => { const step = Math.abs(wheelLeft) < 1 ? wheelLeft : wheelLeft * 0.3; spendWheel(step); wheelLeft -= step; wheelRun = Math.abs(wheelLeft) > 0.1; if (wheelRun) requestAnimationFrame(glideWheel); else wheelLeft = 0; };
 const passWheel = e => {
     const box = e.target.closest?.(".file-scroll, .catalog-scroll"); if (!box || e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
-    const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1), atTop = box.scrollTop <= 0, atEnd = box.scrollTop + box.clientHeight >= box.scrollHeight - 1;
-    if ((dy > 0 && atEnd) || (dy < 0 && atTop)) { e.preventDefault(); if (Math.sign(dy) !== Math.sign(wheelLeft)) wheelLeft = 0; const now = dy * 0.4; scrollBy({ top: now, behavior: "instant" }); wheelLeft += dy - now; if (!wheelRun) { wheelRun = true; requestAnimationFrame(glidePage); } }
+    const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1); e.preventDefault();
+    if (box !== wheelBox || Math.sign(dy) !== Math.sign(wheelLeft)) wheelLeft = 0; wheelBox = box;
+    const now = dy * 0.3; spendWheel(now); wheelLeft += dy - now; if (!wheelRun) { wheelRun = true; requestAnimationFrame(glideWheel); }
 };
 ["file-view", "catalog-body"].forEach(id => $(id).addEventListener("wheel", passWheel, { passive: false }));
 
