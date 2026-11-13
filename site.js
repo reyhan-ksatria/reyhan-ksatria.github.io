@@ -83,3 +83,10 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden) star
 if (matchMedia("(pointer: fine)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
     addEventListener("pointermove", e => { const dx = e.clientX / innerWidth - 0.5, dy = e.clientY / innerHeight - 0.5; document.documentElement.style.setProperty("--px", dx.toFixed(3)); document.documentElement.style.setProperty("--py", dy.toFixed(3)); }, { passive: true });
 }
+
+// When the site is opened straight from local files, the clean page links get their .html names back so they still work offline, while the online site keeps the clean addresses
+if (location.protocol === "file:") {
+    const toFile = h => h === "bundle" ? "bundle.html" : h === "./" ? "index.html" : h.startsWith("./#") ? "index.html" + h.slice(2) : h;
+    const fixLink = a => { const h = a.getAttribute("href"); if (h && toFile(h) !== h) a.setAttribute("href", toFile(h)); };
+    document.querySelectorAll("a[href]").forEach(fixLink); document.addEventListener("click", e => { const a = e.target.closest?.("a[href]"); if (a) fixLink(a); }, true);
+}
