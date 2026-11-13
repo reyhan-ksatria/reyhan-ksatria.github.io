@@ -1039,6 +1039,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
     .iter-hud { flex-wrap: wrap; white-space: normal; gap: 2px 12px; padding: 6px 10px; font-size: 11.5px; }
     .plot-stage:not(:fullscreen) .plot-area:has(.iter-hud:not([hidden])) canvas { border-radius: 12px 12px 0 0; }
     .plot-stage:not(:fullscreen) .iter-hud { position: static; display: grid; grid-template-columns: auto auto; justify-content: start; gap: 4px 18px; max-width: none; min-height: 52px; padding: 10px 56px 10px 14px; border: 0; border-top: 1px solid rgb(140 170 255 / .14); border-radius: 0 0 12px 12px; background: #04060f; backdrop-filter: none; -webkit-backdrop-filter: none; }
+    .plot-stage:not(:fullscreen) .iter-hud > span { white-space: nowrap; }
+    .plot-stage:not(:fullscreen) .iter-hud > span:last-child { grid-column: 1 / -1; }
     .plot-stage:not(:fullscreen) .fs-btn { right: 10px; bottom: 10px; }
     .scale-bar { top: 8px; right: 8px; gap: 2px; padding: 5px 8px 6px; font-size: 10px; }
     .sb-title { font-size: 9.5px; }
