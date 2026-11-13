@@ -248,6 +248,7 @@ function renderPlot() {
     ui.dotKm = el(plotSvg, "circle", { r: 5, class: "dot-km", visibility: "hidden" });
     ui.dotW = el(plotSvg, "circle", { r: 5, class: "dot-weibull", visibility: "hidden" });
     ui.brush = el(plotSvg, "rect", { class: "plot-brush", visibility: "hidden" });
+    updateZoomButtons();
 }
 
 // Place the cursor at the nearest whole day and show the readout of both survival values
@@ -347,16 +348,31 @@ function setView(next, minW, minH) {
 // True when both Kaplan–Meier and Weibull still pass through a window, sampled across its days
 const bothCurvesIn = v => { let w = false, k = false; for (let q = 0; q <= 80 && !(w && k); q++) { const t = v.x0 + q / 80 * (v.x1 - v.x0), a = weibullS(t), b = kmS(t); w ||= a >= v.y0 && a <= v.y1; k ||= b >= v.y0 && b <= v.y1; } return w && k; };
 
-// Zoom buttons scale the 2D window around the middle day and the curves at that day, so the curves stay in the center, stop zooming in just before either curve would leave the window, restore the full view, and hand over to the 3D camera in 3D mode
+// The window one zoom button press produces, scaled around the middle day and the curves at that day so the curves stay in the center
+const zoomStep = f => { const cx = (view.x0 + view.x1) / 2, cy = (weibullS(cx) + kmS(cx)) / 2, w = (view.x1 - view.x0) * f, h = (view.y1 - view.y0) * f; return clampView({ x0: cx - w / 2, x1: cx + w / 2, y0: cy - h / 2, y1: cy + h / 2 }, 1e-6, 1e-9); };
+
+// Zoom buttons stop zooming in just before either curve would leave the window, restore the full view, and hand over to the 3D camera in 3D mode
 document.querySelectorAll("[data-zoom]").forEach(btn => btn.addEventListener("click", () => {
     if (viewMode === "3d") return zoom3d(btn.dataset.zoom);
     if (animating) return;
-    const mode = btn.dataset.zoom, f = mode === "in" ? 0.5 : 2, cx = (view.x0 + view.x1) / 2, cy = (weibullS(cx) + kmS(cx)) / 2;
+    const mode = btn.dataset.zoom;
     if (mode === "reset") return setView(fullView);
-    const next = clampView({ x0: cx - (view.x1 - view.x0) * f / 2, x1: cx + (view.x1 - view.x0) * f / 2, y0: cy - (view.y1 - view.y0) * f / 2, y1: cy + (view.y1 - view.y0) * f / 2 }, 1e-6, 1e-9);
+    const next = zoomStep(mode === "in" ? 0.5 : 2);
     if (mode === "in" && !bothCurvesIn(next)) return;
     setView(next, 1e-6, 1e-9);
 }));
+
+// Dim each zoom button once it can no longer change the view: zoom in at the deepest zoom, zoom out and reset at the starting view
+const zoomBtns = Object.fromEntries([...document.querySelectorAll("[data-zoom]")].map(b => [b.dataset.zoom, b]));
+function updateZoomButtons() {
+    if (viewMode === "3d") {
+        const home = progress === 1 && ["yaw", "pitch", "zoom", "tx", "ty", "tz"].every(k => Math.abs(cam[k] - camHome[k]) < 1e-9);
+        zoomBtns.in.disabled = cam.zoom >= 5e8; zoomBtns.out.disabled = cam.zoom <= camHome.zoom * 1.0001; zoomBtns.reset.disabled = home;
+        return;
+    }
+    const [zx, zy] = zoomFactors(view.x1 - view.x0, view.y1 - view.y0, 1e-6, 1e-9), full = zx <= 1.001 && zy <= 1.001;
+    zoomBtns.in.disabled = !bothCurvesIn(zoomStep(0.5)); zoomBtns.out.disabled = full; zoomBtns.reset.disabled = full;
+}
 
 // Mouse drag draws a brush rectangle and zooms into it on release
 plotSvg.addEventListener("pointerdown", e => {
@@ -762,6 +778,7 @@ function drawFitInset(k, tau, W, H, dpr, body) {
 // Draw space, the glowing likelihood grid, contour rings, the sun at the optimum, past iterates as stars, and the comet in flight
 function render3d(now = performance.now()) {
     if (!grid) buildGrid();
+    updateZoomButtons();
     const dpr = (devicePixelRatio || 1) * fsScale, W = canvas3d.clientWidth * dpr, H = canvas3d.clientHeight * dpr;
     if (canvas3d.width !== W || canvas3d.height !== H) { canvas3d.width = W; canvas3d.height = H; }
     const P = (k, tau, f) => project(toWorld(k, tau, f), W, H), body = getComputedStyle(document.body).fontFamily;
@@ -1387,7 +1404,7 @@ new ResizeObserver(() => { if (viewMode === "3d") render3d(); }).observe(canvas3
 function zoom3d(mode) {
     pause(); spin = 0;
     if (mode === "reset") { cam = { ...camHome }; endedAt = null; cancelSn(); progress = 1; }
-    else cam = { ...cam, zoom: Math.min(5e8, Math.max(0.6, cam.zoom * (mode === "in" ? 1.5 : 1 / 1.5))) };
+    else cam = { ...cam, zoom: Math.min(5e8, Math.max(camHome.zoom, cam.zoom * (mode === "in" ? 1.5 : 1 / 1.5))) };
     render3d(); syncPlayer();
 }
 
@@ -1414,7 +1431,7 @@ document.querySelectorAll("[data-view]").forEach(btn => btn.addEventListener("cl
     plotTip.hidden = true;
     plotTip.classList.toggle("tip-space", viewMode === "3d");
     if (viewMode === "3d") { $("zoom-level").hidden = true; syncPlayer(); opened3d ? render3d() : intro3d(); soundVisibility(true); }
-    else { pause(); updateZoomLevel(); soundVisibility(false); scaleBar.hidden = true; cursorCoords.hidden = true; }
+    else { pause(); updateZoomLevel(); updateZoomButtons(); soundVisibility(false); scaleBar.hidden = true; cursorCoords.hidden = true; }
 }));
 document.fonts?.ready.then(() => { if (viewMode === "3d") render3d(); });
 
