@@ -1,7 +1,7 @@
 // Research entries listed in a chosen order; file is the document opened from the link under the preview, and preview is an image or PDF shown beside the entry or a blank frame when empty
 const research = [
     {
-        id: "research-weather", type: "Collaborative Research", period: "Jul 2026",
+        id: "research-weather", type: "Collaborative Research", period: "Jun 2026",
         title: "BBQ Weather Prediction in Basel Using Ensemble Machine Learning",
         summary: "Next-day classification of BBQ-suitable weather in Basel using a weighted voting ensemble of machine learning classifiers, with lag-based features to prevent label leakage, evaluated through bootstrap resampling and McNemar's test.",
         file: "files/weather-prediction.pdf", linkLabel: "View report", preview: "files/weather-prediction-cover.png"
