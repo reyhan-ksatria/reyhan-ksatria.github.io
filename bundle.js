@@ -144,8 +144,16 @@ fitTrack(); addEventListener("resize", fitTrack); document.fonts?.ready.then(fit
 // Questions that open in place
 $("faq-list").innerHTML = bundle.faq.map(f => `<details><summary>${f.q}</summary><p>${f.a}</p></details>`).join("");
 
+// The address bar follows the section in view on scroll without adding history entries, and drops the hash at the top of the page
+const pageSections = ["top", "bundles", "inside", "catalogue", "buying", "faq"].map($);
+let shownHash = location.hash;
+function syncHash() {
+    const atBottom = innerHeight + scrollY >= document.body.offsetHeight - 4, id = atBottom ? "faq" : pageSections.filter(s => s.getBoundingClientRect().top < 160).pop()?.id ?? "top", hash = id === "top" ? "" : `#${id}`;
+    if (hash !== shownHash) { shownHash = hash; history.replaceState(history.state, "", location.pathname + location.search + hash); }
+}
+
 // Scroll keeps the progress bar and the timeline in step, and layout settles once fonts are ready
-addEventListener("scroll", () => { syncProgress(); syncTimeline(); }, { passive: true });
+addEventListener("scroll", () => { syncProgress(); syncTimeline(); syncHash(); }, { passive: true });
 placeNavIndicator(); syncProgress(); syncTimeline(); document.fonts?.ready.then(placeNavIndicator);
 
 // A reload or a Back or Forward visit brings the visitor back to where they were in this tab: the scroll position, the field open in the catalogue, and the file open in the explorer; a new visit starts at the top

@@ -172,13 +172,18 @@ themeToggle.addEventListener("click", () => {
     if (viewMode === "3d") render3d();
 });
 
-// Highlight the nav link of the section currently in view
+// The address bar follows the section in view without adding history entries, and drops the hash at the top of the page
+let shownHash = location.hash;
+const syncHash = id => { const hash = id === "top" ? "" : `#${id}`; if (hash !== shownHash) { shownHash = hash; history.replaceState(history.state, "", location.pathname + location.search + hash); } };
+
+// Highlight the nav link of the section currently in view, and on scroll also point the address bar at it
 const navLinks = document.querySelectorAll(".nav-link");
 const sections = ["top", "about", "academic", "research", "projects", "experience", "skills", "contact"].map($);
-function syncActiveLink() {
+function syncActiveLink(e) {
     const atBottom = innerHeight + scrollY >= document.body.offsetHeight - 4;
     const current = atBottom ? "contact" : sections.filter(s => s.getBoundingClientRect().top < 160).pop()?.id ?? "top";
     navLinks.forEach(a => a.classList.toggle("active", a.getAttribute("href") === `#${current}`));
+    if (e) syncHash(current);
     placeNavIndicator();
     const max = document.documentElement.scrollHeight - innerHeight;
     $("scroll-progress").style.transform = `scaleX(${max > 0 ? Math.min(1, scrollY / max) : 0})`;
