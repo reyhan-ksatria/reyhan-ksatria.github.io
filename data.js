@@ -56,7 +56,7 @@ const certificates = [
     { title: "PEMNAS UB 2025 Problem Setting Team", issuer: "Universitas Brawijaya", file: "files/pemnas-2025.png" },
     { title: "PEMNAS UB 2024 Problem Setting Team", issuer: "Universitas Brawijaya", file: "files/pemnas-2024.png" },
     { title: "Finalist LMNas UGM 2021", issuer: "Universitas Gadjah Mada", file: "files/lmnas-2021.png" },
-    { title: "Bronze Medal KMNR 2017", issuer: "Klinik Pendidikan MIPA (KPM)", file: "files/kmnr-2017.png" }
+    { title: "Bronze Medal KMNR 2018", issuer: "Klinik Pendidikan MIPA (KPM)", file: "files/kmnr-2018.png" }
 ];
 
 // Course list as [rank, name, credits, score, grade]; null score means the score is not available
